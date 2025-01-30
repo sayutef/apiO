@@ -1,22 +1,34 @@
 package main
 
 import (
-	"ApiRestAct1/src/students/infraestructure"
-	"ApiRestAct1/src/students/infraestructure/routes"
+	asignatureInfra "ApiRestAct1/src/asignatures/infraestructure"
+	asignatureRoutes "ApiRestAct1/src/asignatures/infraestructure/routes"
+	studentInfra "ApiRestAct1/src/students/infraestructure"
+	studentRoutes "ApiRestAct1/src/students/infraestructure/routes"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	dependencies := infraestructure.InitStudent()
-
 	r := gin.Default()
 
-	routes.ConfigureRoutes(r,
-		dependencies.CreateStudentController,
-		dependencies.ListStudentController,
-		dependencies.ListStudentByIDController,
-		dependencies.UpdateStudentController,
-		dependencies.DeleteStudentController)
+	studentDependencies := studentInfra.InitStudent()
+	studentRoutes.ConfigureRoutes(r,
+		studentDependencies.CreateStudentController,
+		studentDependencies.ListStudentController,
+		studentDependencies.ListStudentByIDController,
+		studentDependencies.UpdateStudentController,
+		studentDependencies.DeleteStudentController,
+	)
+
+	asignatureDependencies := asignatureInfra.InitAsignature()
+	asignatureRoutes.ConfigureRoutesAsignature(
+		r,
+		asignatureDependencies.CreateAsignatureController,
+		asignatureDependencies.ListAsignatureController,
+		asignatureDependencies.ListAsignatureByIDController,
+		asignatureDependencies.UpdateAsignatureController,
+		asignatureDependencies.DeleteAsignatureController,
+	)
 
 	r.Run(":8080")
 }
