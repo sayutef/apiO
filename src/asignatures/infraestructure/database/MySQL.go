@@ -19,18 +19,23 @@ func NewMySQL() *MySQL {
 	return &MySQL{conn: conn}
 }
 
-func (mysql *MySQL) Save(asignature entities.Asignature) error {
+func (mysql *MySQL) Save(asignature entities.Asignature) (entities.Asignature, error) {
 	query := "INSERT INTO Asignature (name_asignature, description_asignature) VALUES (?, ?)"
 	result, err := mysql.conn.ExecutePreparedQuery(query, asignature.Name, asignature.Description)
 	if err != nil {
-		return fmt.Errorf("error al ejecutar la consulta: %v", err)
+		return entities.Asignature{}, fmt.Errorf("error al ejecutar la consulta: %v", err)
 	}
 
-	rowsAffected, _ := result.RowsAffected()
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return entities.Asignature{}, fmt.Errorf("error al obtener filas afectadas: %v", err)
+	}
+
 	if rowsAffected == 1 {
 		log.Printf("[MySQL] - Filas afectadas: %d", rowsAffected)
 	}
-	return nil
+
+	return asignature, nil
 }
 
 func (mysql *MySQL) GetAll() ([]entities.Asignature, error) {
